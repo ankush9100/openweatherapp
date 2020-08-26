@@ -12,6 +12,8 @@ export default function SplashScreen(props) {
     useEffect(()=>{
     getLocation();
     },[])
+
+    //get the data from the api
     const getLocation = async () => {
         setLoading(true)
         Geolocation.getCurrentPosition(async (info) => {
