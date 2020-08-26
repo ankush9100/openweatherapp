@@ -5,17 +5,18 @@ import DaysTemperatureContainer from '../common/DaysTemperatureContainer'
 import Geolocation from '@react-native-community/geolocation';
 import { getWeatherData } from '../utils/api/api'
 import Loader from '../common/Loader';
-import SomethingWrong from '../common/SomethingWrong';
+
 import { useStore, useDispatch } from "react-redux";
 import {saveTemperatureData} from '../redux/temperatureAction'
 
 export default function HomeScreen() {
     const store = useStore();
+    const {temperatureReducer} = store.getState()
     const [data, setData] = useState([]);
     const [city, setCity] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
-    const [storeData,setStoreData] = useState(store.getState())
+    const [storeData,setStoreData] = useState(temperatureReducer.data)
     const dispatch = useDispatch();
     useEffect(() => {
         getLocation();
@@ -28,50 +29,29 @@ export default function HomeScreen() {
         return dayName
     }
     const getLocation = async () => {
-        setLoading(true)
-        Geolocation.getCurrentPosition(async (info) => {
-            let result = await getWeatherData(info.coords.latitude, info.coords.longitude);
-            if (result.status == 200) {
-                let newValue = result.data.list;
-                dispatch({type:'SAVETEMPERATURE',payload:newValue})
-                setCity(result.data.city.name)
-                let value = [];
-                for (let i = 0; i < newValue.length; i += 8) {
-                    let vals = result.data.list[i];
+        setCity(storeData.city.name)
+        let value = [];
+                for (let i = 0; i < storeData.list.length; i += 8) {
+                    let vals = storeData.list[i];
                     let date = new Date();
                     vals.day = getTravelDateFormatted(date.setDate(date.getDate() + i))
-                    value.push(result.data.list[i])
-                    
+                    value.push(storeData.list[i])
                 }
                 setData(value)
-            } else {
-               
-                setError(true)
-            }
-            setLoading(false)
-
-        })
-
-    }
-    if (loading) {
-        return (
-            <Loader />
-        )
     }
     return (
         <View style={styles.container}>
 
             <StatusBar backgroundColor="#27295B" barStyle="light-content" />
-            {error ?
-                <SomethingWrong retry={getLocation} /> :
-                <View>
+           
+
                     <View style={styles.locationContainer}>
                         <LocationComponent temp={data[0]?data[0].main?data[0].main.temp_min:'10':'10'} state={city} />
                     </View>
                     <DaysTemperatureContainer data={data} />
                 </View>
-            }
-        </View>
+        
+        
     )
 }
 const styles = StyleSheet.create({
