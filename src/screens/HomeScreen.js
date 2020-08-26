@@ -20,14 +20,16 @@ export default function HomeScreen() {
     const dispatch = useDispatch();
     useEffect(() => {
         getLocation();
-        // alert(JSON.stringify(storeData))
     },[storeData])
+
+    //Convert date to day name
     const getTravelDateFormatted = (str) => {
         const daysNames = ['Sunday', 'Monday', 'Tueday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
             d = new Date(str),
             dayName = daysNames[d.getDay()];
         return dayName
     }
+    //get the data from redux store
     const getLocation = async () => {
         setCity(storeData.city.name)
         let value = [];
@@ -41,10 +43,7 @@ export default function HomeScreen() {
     }
     return (
         <View style={styles.container}>
-
             <StatusBar backgroundColor="#27295B" barStyle="light-content" />
-           
-
                     <View style={styles.locationContainer}>
                         <LocationComponent temp={data[0]?data[0].main?data[0].main.temp_min:'10':'10'} state={city} />
                     </View>
